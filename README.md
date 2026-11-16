@@ -7,7 +7,7 @@
 
 IDE Python independente, com desenvolvimento iniciado no macOS Intel e arquitetura em Python/Qt para futura distribuição em Windows e Linux.
 
-**Versão 0.3.0: ícones por formato e realce sintático ampliado. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+**Versão 0.3.1: ícones por formato e realce sintático ampliado. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/dark.png">
@@ -56,6 +56,10 @@ No Windows, use `.venv\Scripts\python.exe` no lugar de `.venv/bin/python`. O có
 - Testes via unittest; pytest pode ser executado no painel Comandos se instalado no ambiente.
 - Status e diff Git, consultados sem commits ou alterações automáticas.
 - Salvamento atômico, preservação do encoding Python, detecção de conflito externo e recuperação de abas salvas ao reiniciar.
+
+## Fechar projeto ou pasta
+
+Use **Arquivo → Fechar projeto/pasta** para voltar à tela inicial. O EditPy permite salvar, descartar ou cancelar alterações antes de fechar as abas. Se houver processos ou terminais ativos, confirma o encerramento das sessões. Cancelar mantém o projeto aberto. A pasta permanece nos projetos recentes e os arquivos no disco são preservados; o projeto fechado não é reaberto automaticamente ao reiniciar.
 
 ## Terminal e console em abas
 

@@ -77,6 +77,7 @@ class MainWindow(QMainWindow):
         self.pool.setMaxThreadCount(3)
         self.workers = set()
         self.search_version = 0
+        self.workspace_generation = 0
         self.terminal_count = 0
         self.console_count = 0
         self.setWindowTitle("EditPy")
@@ -162,11 +163,7 @@ class MainWindow(QMainWindow):
         layout.addSpacing(28)
         self.recents = QListWidget()
         self.recents.setMaximumHeight(150)
-        for recent in self.settings.value("recents", [], type=list):
-            if Path(recent).is_dir():
-                item = QListWidgetItem(f"{Path(recent).name}   —   {recent}")
-                item.setData(Qt.ItemDataRole.UserRole, recent)
-                self.recents.addItem(item)
+        self.refresh_recents()
         self.recents.itemDoubleClicked.connect(
             lambda item: self.open_project(Path(item.data(Qt.ItemDataRole.UserRole)))
         )
@@ -371,6 +368,8 @@ class MainWindow(QMainWindow):
         self.action(file, "Novo arquivo", self.new_file, QKeySequence.StandardKey.New)
         self.action(file, "Abrir arquivo…", self.choose_file, QKeySequence.StandardKey.Open)
         self.action(file, "Abrir projeto…", self.choose_project, "Ctrl+Alt+O")
+        self.close_project_action = self.action(file, "Fechar projeto/pasta", self.close_project)
+        self.close_project_action.setEnabled(False)
         self.action(file, "Criar arquivo no projeto…", self.create_project_file)
         file.addSeparator()
         self.action(file, "Salvar", self.save_current, QKeySequence.StandardKey.Save)
@@ -449,7 +448,7 @@ class MainWindow(QMainWindow):
             lambda: QMessageBox.about(
                 self,
                 "EditPy",
-                "EditPy 0.3.0\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nPrimeira versão macOS.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
+                "EditPy 0.3.1\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nPrimeira versão macOS.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
             ),
         )
 
@@ -584,15 +583,18 @@ class MainWindow(QMainWindow):
 
     def background(self, function, callback):
         worker = Worker(function)
+        generation = self.workspace_generation
         self.workers.add(worker)
 
         def done(result):
             self.workers.discard(worker)
-            callback(result)
+            if generation == self.workspace_generation:
+                callback(result)
 
         def failed(message):
             self.workers.discard(worker)
-            self.statusBar().showMessage(message, 10000)
+            if generation == self.workspace_generation:
+                self.statusBar().showMessage(message, 10000)
 
         worker.signals.done.connect(done)
         worker.signals.failed.connect(failed)
@@ -622,7 +624,13 @@ class MainWindow(QMainWindow):
                     return
             for index in reversed(range(self.tabs.count())):
                 self.close_tab(index, confirmed=True)
+        self.workspace_generation += 1
         self.root = path
+        self.close_project_action.setEnabled(True)
+        if self.tree.model() is None:
+            self.tree.setModel(self.tree_model)
+            for column in range(1, 4):
+                self.tree.hideColumn(column)
         self.model.setRootPath(str(path))
         self.tree.setRootIndex(self.tree_model.mapFromSource(self.model.index(str(path))))
         self.project_label.setText(path.name)
@@ -630,11 +638,87 @@ class MainWindow(QMainWindow):
         self.settings.setValue("project", str(path))
         recents = self.settings.value("recents", [], type=list)
         self.settings.setValue("recents", [str(path)] + [p for p in recents if p != str(path)][:9])
+        self.refresh_recents()
         if restore:
             for filename in self.settings.value(self.session_key(), [], type=list):
                 if Path(filename).is_file():
                     self.open_file(Path(filename))
         self.statusBar().showMessage(str(path))
+
+    def refresh_recents(self):
+        self.recents.clear()
+        for recent in self.settings.value("recents", [], type=list):
+            if Path(recent).is_dir():
+                item = QListWidgetItem(f"{Path(recent).name}   —   {recent}")
+                item.setData(Qt.ItemDataRole.UserRole, recent)
+                self.recents.addItem(item)
+
+    def has_running_processes(self):
+        return (
+            self.run_panel.busy()
+            or self.command_panel.busy()
+            or any(tab.session.busy() for tab in self.terminals())
+        )
+
+    def stop_workspace_processes(self):
+        for tab in self.terminals():
+            tab.stop()
+        for panel in (self.run_panel, self.command_panel):
+            panel.stop()
+            if panel.busy():
+                panel.process.waitForFinished(1500)
+
+    def close_project(self):
+        if self.root is None:
+            return True
+        # Collect all decisions first. Cancelling preserves documents and sessions.
+        for editor in self.editors():
+            if not self.confirm_document_close(editor):
+                return False
+        if self.has_running_processes():
+            answer = QMessageBox.question(
+                self,
+                "Fechar projeto/pasta",
+                "Encerrar os processos e as sessões de terminal deste projeto e fechá-lo?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return False
+        self.settings.setValue(self.session_key(), [str(e.path) for e in self.editors() if e.path])
+        self.workspace_generation += 1
+        self.search_version += 1
+        self.outline_timer.stop()
+        self.stop_workspace_processes()
+        for index in reversed(range(self.tabs.count())):
+            self.close_tab(index, confirmed=True)
+        self.root = None
+        self.arguments = ""
+        self.settings.remove("project")
+        self.settings.sync()
+        self.tree.setModel(None)
+        self.model.setRootPath("")
+        self.outline.clear()
+        self.search_results.clear()
+        self.search_input.clear()
+        self.problems.clear()
+        self.git_output.clear()
+        self.run_panel.output.clear()
+        self.command_panel.output.clear()
+        self.command_input.clear()
+        self.find_bar.hide()
+        self.find_input.clear()
+        self.replace_input.clear()
+        self.tools_dock.hide()
+        self.breadcrumb.setText("  EDITOR")
+        self.location.setText("Nenhum projeto aberto  ")
+        self.project_label.setText("Seu espaço de desenvolvimento")
+        self.setWindowTitle("EditPy")
+        self.close_project_action.setEnabled(False)
+        self.stack.setCurrentIndex(0)
+        self.refresh_recents()
+        self.statusBar().showMessage("Projeto fechado. Abra uma pasta para continuar.")
+        return True
 
     def choose_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Abrir arquivo", str(self.root or Path.home()))
@@ -1387,11 +1471,7 @@ class MainWindow(QMainWindow):
                 editor.update_gutter_width()
 
     def closeEvent(self, event):
-        if (
-            self.run_panel.busy()
-            or self.command_panel.busy()
-            or any(tab.session.busy() for tab in self.terminals())
-        ):
+        if self.has_running_processes():
             answer = QMessageBox.question(
                 self,
                 "Processos em execução",
@@ -1417,17 +1497,13 @@ class MainWindow(QMainWindow):
                 ):
                     event.ignore()
                     return
-        for tab in self.terminals():
-            tab.stop()
-        self.run_panel.stop()
-        self.command_panel.stop()
-        self.run_panel.process.waitForFinished(1500)
-        self.command_panel.process.waitForFinished(1500)
+        self.stop_workspace_processes()
         self.settings.setValue("geometry", self.saveGeometry())
-        self.settings.setValue(
-            self.session_key(),
-            [str(editor.path) for editor in self.editors() if editor.path],
-        )
+        if self.root is not None:
+            self.settings.setValue(
+                self.session_key(),
+                [str(editor.path) for editor in self.editors() if editor.path],
+            )
         self.settings.sync()
         self.pool.waitForDone(3000)
         event.accept()

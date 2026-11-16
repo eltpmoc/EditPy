@@ -105,6 +105,15 @@ def verify(window, report):
                 app.processEvents()
             report.parent.mkdir(parents=True, exist_ok=True)
             window.grab().save(str(report.with_suffix(".png")))
+            for terminal in window.terminals():
+                terminal.stop()
+            checks["close_project"] = (
+                window.close_project()
+                and window.root is None
+                and window.tabs.count() == 0
+                and window.tree.model() is None
+                and not window.settings.contains("project")
+            )
             checks["ok"] = all(checks.values())
     except Exception as error:
         checks["ok"] = False

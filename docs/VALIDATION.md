@@ -82,3 +82,8 @@ Verificação visual no Finder: o novo ícone aparece sem o símbolo de proibiç
 A suíte local cobre 31 cenários, incluindo papéis de declaração/parâmetro/chamada/tipo; isolamento entre funções; comentários com aspas; strings com `#`; strings multilinha e código após o delimitador; interpolação de f-strings; identificadores Unicode e posições UTF-16; Python incompleto; lexer JSON e texto simples; descarte de análises antigas; troca de paleta; nomes e extensões especiais; renderização dos SVGs e atualização do ícone/lexer ao salvar como.
 
 O smoke test empacotado também verifica o realce de funções, a análise JSON e o carregamento de ícones representativos. O atlas de ícones e as capturas do editor em ambos os temas ficam em `docs/screenshots/`.
+
+
+## Revisão 0.3.1 — fechar projeto/pasta
+
+A suíte passou a 36 cenários. Os novos testes acionam a opção do menu e verificam limpeza da área de trabalho, reabertura posterior e início sem restaurar o projeto fechado; cancelamento de documentos modificados; salvamento antes de encerrar shell/processo; cancelamento da confirmação de processos; descarte de resultados de background recebidos após o fechamento. O smoke test empacotado também fecha o projeto e confere abas, árvore e preferências.

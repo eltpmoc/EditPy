@@ -199,3 +199,110 @@ def test_brand_assets_follow_theme(window):
         assert not window.welcome_logo.pixmap().isNull()
         assert window.brand_label.pixmap().height() == 32
         assert window.welcome_logo.pixmap().height() == 94
+
+
+def test_close_project_menu_clears_workspace_and_does_not_reopen_on_restart(window, tmp_path):
+    path = tmp_path / "main.py"
+    path.write_text("answer = 42\n")
+    window.open_file(path)
+    window.search_input.setText("answer")
+    window.git_output.setPlainText("old project")
+    assert window.close_project_action.isEnabled()
+    window.close_project_action.trigger()
+    assert window.root is None
+    assert window.tabs.count() == 0
+    assert window.tree.model() is None
+    assert window.stack.currentIndex() == 0
+    assert window.git_output.toPlainText() == ""
+    assert window.search_input.text() == ""
+    assert not window.settings.contains("project")
+    assert not window.close_project_action.isEnabled()
+    assert path.exists()  # Closing must not remove project files.
+    restored = MainWindow()
+    try:
+        assert restored.root is None
+        assert restored.tabs.count() == 0
+    finally:
+        restored.close()
+    window.open_project(tmp_path)
+    assert window.root == tmp_path
+    assert window.tree.model() is window.tree_model
+    assert window.close_project_action.isEnabled()
+
+
+def test_cancel_close_project_preserves_unsaved_documents(window, tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+
+    path = tmp_path / "main.py"
+    path.write_text("original = 1\n")
+    editor = window.open_file(path)
+    editor.insertPlainText("# unsaved\n")
+    monkeypatch.setattr(QMessageBox, "question", lambda *args: QMessageBox.StandardButton.Cancel)
+    assert not window.close_project()
+    assert window.root == tmp_path
+    assert window.tabs.count() == 1
+    assert editor.document().isModified()
+    assert path.read_text() == "original = 1\n"
+    assert window.close_project_action.isEnabled()
+
+
+def test_close_project_saves_files_and_stops_shell_and_run_process(
+    window, app, tmp_path, monkeypatch
+):
+    from PySide6.QtWidgets import QMessageBox
+
+    monkeypatch.setenv("SHELL", "/bin/sh")
+    path = tmp_path / "main.py"
+    path.write_text("answer = 42\n")
+    editor = window.open_file(path)
+    editor.insertPlainText("# saved on close\n")
+    terminal = window.open_terminal()
+    window.run_panel.start(
+        sys.executable, ["-u", "-c", 'import time; print("CLOSE_READY"); time.sleep(60)'], tmp_path
+    )
+    wait(app, lambda: "CLOSE_READY" in window.run_panel.output.toPlainText())
+    answers = iter([QMessageBox.StandardButton.Save, QMessageBox.StandardButton.Yes])
+    monkeypatch.setattr(QMessageBox, "question", lambda *args: next(answers))
+    assert window.close_project()
+    assert path.read_text().startswith("# saved on close")
+    assert terminal.session.master is None
+    assert not terminal.session.busy()
+    assert not window.run_panel.busy()
+    assert window.root is None
+    assert window.tabs.count() == 0
+
+
+def test_cancel_process_confirmation_preserves_terminal(window, app, tmp_path, monkeypatch):
+    from PySide6.QtWidgets import QMessageBox
+
+    monkeypatch.setenv("SHELL", "/bin/sh")
+    terminal = window.open_terminal()
+    terminal.session.write(b"printf 'CLOSE_%s\\n' READY\r")
+    wait(app, lambda: "CLOSE_READY" in terminal.view.plain_text())
+    monkeypatch.setattr(QMessageBox, "question", lambda *args: QMessageBox.StandardButton.No)
+    try:
+        assert not window.close_project()
+        assert window.root == tmp_path
+        assert terminal.session.busy()
+        assert window.tabs.count() == 1
+    finally:
+        window.close_tab(window.tabs.indexOf(terminal))
+
+
+def test_closed_project_discards_pending_background_results(window, app):
+    import threading
+
+    started, release = threading.Event(), threading.Event()
+    results = []
+
+    def work():
+        started.set()
+        release.wait(5)
+        return "result from the closed project"
+
+    window.background(work, results.append)
+    assert started.wait(1)
+    assert window.close_project()
+    release.set()
+    wait(app, lambda: not window.workers)
+    assert results == []
