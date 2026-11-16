@@ -25,7 +25,7 @@ def verify(window, report):
 
     try:
         with tempfile.TemporaryDirectory(prefix="editpy-smoke-") as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
             window.open_project(root)
             path = root / "main.py"
             path.write_text("import os\nos.pa", encoding="utf-8")
@@ -70,6 +70,20 @@ def verify(window, report):
                     "types.ts",
                     "image.svg",
                 ]
+            )
+            copied = root / "copied"
+            moved = root / "moved"
+            copied.mkdir()
+            moved.mkdir()
+            copied_ok = window.transfer_project_items([path], copied)
+            moved_ok = window.transfer_project_items([path], moved, move=True)
+            checks["explorer_operations"] = (
+                copied_ok
+                and moved_ok
+                and (copied / path.name).read_text() == editor.toPlainText()
+                and editor.path == moved / path.name
+                and not path.exists()
+                and len(window.project_buttons) == 4
             )
             window.set_theme("light")
             app.processEvents()

@@ -26,7 +26,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QTreeView,
     QTabWidget,
     QDockWidget,
     QLineEdit,
@@ -56,11 +55,12 @@ from .services import (
 from .tasks import Worker, ProcessPanel
 from .themes import stylesheet
 from .terminal import TerminalTab
-from .project_tree import ProjectFilter, ProjectIcons
+from .project_tree import ProjectFilter, ProjectIcons, ProjectTree
+from .explorer import ExplorerMixin
 from .platforms import parse_arguments, apply_native_theme
 
 
-class MainWindow(QMainWindow):
+class MainWindow(ExplorerMixin, QMainWindow):
     def __init__(self, project=None):
         super().__init__()
         self.settings = QSettings(
@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
         self.model.setIconProvider(self.file_icons)
         self.tree_model = ProjectFilter(self)
         self.tree_model.setSourceModel(self.model)
-        self.tree = QTreeView()
+        self.tree = ProjectTree()
         self.tree.setModel(self.tree_model)
         self.tree.setObjectName("projectTree")
         self.tree.setIndentation(16)
@@ -270,7 +270,9 @@ class MainWindow(QMainWindow):
         for column in range(1, 4):
             self.tree.hideColumn(column)
         self.tree.doubleClicked.connect(self.open_tree_item)
-        self.project_dock = self.dock("PROJETO", self.tree, Qt.DockWidgetArea.LeftDockWidgetArea)
+        self.project_dock = self.dock(
+            "PROJETO", self.build_explorer(), Qt.DockWidgetArea.LeftDockWidgetArea
+        )
         self.resizeDocks([self.project_dock], [244], Qt.Orientation.Horizontal)
         self.outline = QListWidget()
         self.outline.itemActivated.connect(
@@ -452,7 +454,7 @@ class MainWindow(QMainWindow):
             lambda: QMessageBox.about(
                 self,
                 "EditPy",
-                "EditPy 0.4.0\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nPrimeira versão macOS.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
+                "EditPy 0.5.0\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nmacOS e Windows.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
             ),
         )
 
@@ -630,6 +632,7 @@ class MainWindow(QMainWindow):
                 self.close_tab(index, confirmed=True)
         self.workspace_generation += 1
         self.root = path
+        self.update_project_actions()
         self.close_project_action.setEnabled(True)
         if self.tree.model() is None:
             self.tree.setModel(self.tree_model)
@@ -697,6 +700,7 @@ class MainWindow(QMainWindow):
         for index in reversed(range(self.tabs.count())):
             self.close_tab(index, confirmed=True)
         self.root = None
+        self.update_project_actions()
         self.arguments = ""
         self.settings.remove("project")
         self.settings.sync()
@@ -732,22 +736,6 @@ class MainWindow(QMainWindow):
     def new_file(self):
         self.add_editor(None, "")
 
-    def create_project_file(self):
-        if not self.root:
-            return self.choose_project()
-        name, ok = QInputDialog.getText(self, "Criar arquivo", "Caminho relativo ao projeto:")
-        if ok and name:
-            path = (self.root / name).resolve()
-            if not path.is_relative_to(self.root):
-                return self.error("Escolha um caminho dentro do projeto.")
-            try:
-                path.parent.mkdir(parents=True, exist_ok=True)
-                with path.open("x"):
-                    pass
-                self.open_file(path)
-            except OSError as error:
-                self.error(error)
-
     def open_file(self, path, line=None, column=0):
         path = path.resolve()
         for index in range(self.tabs.count()):
@@ -768,6 +756,8 @@ class MainWindow(QMainWindow):
 
     def add_editor(self, path, source):
         editor = CodeEditor(path, self.theme, self.font_size)
+        self.enable_file_drop(editor)
+        self.enable_file_drop(editor.viewport())
         editor.setPlainText(source)
         editor.document().setModified(False)
         editor.document().modificationChanged.connect(lambda _: self.update_tab(editor))
@@ -878,6 +868,8 @@ class MainWindow(QMainWindow):
         return True
 
     def invoke_edit(self, method):
+        if self.tree.hasFocus() and method in {"copy", "paste"}:
+            return self.copy_project_items() if method == "copy" else self.paste_project_items()
         editor = self.editor()
         if editor:
             getattr(editor, method)()

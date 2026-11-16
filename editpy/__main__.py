@@ -23,7 +23,7 @@ def main():
     app = QApplication(sys.argv[:1])
     app.setStyle("Fusion")
     app.setApplicationName("EditPy")
-    app.setApplicationVersion("0.4.0")
+    app.setApplicationVersion("0.5.0")
     app.setOrganizationName("EditPy")
     app.setAttribute(Qt.ApplicationAttribute.AA_DontShowIconsInMenus, False)
     if args.smoke_test:

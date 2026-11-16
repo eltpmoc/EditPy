@@ -71,6 +71,9 @@ def stylesheet(theme):
     QWidget#dockHeader { background: %(panel)s; border-bottom: 1px solid %(border)s; }
     QLabel#dockCaption { color: %(muted)s; font-size: 10px; font-weight: 600; letter-spacing: 1.2px; }
     QToolButton#panelClose { border: 0; padding: 0 4px; color: %(muted)s; background: transparent; }
+    QWidget#projectActions { background: %(panel)s; border-bottom: 1px solid %(border)s; }
+    QWidget#projectActions QToolButton { border: 0; padding: 5px; border-radius: 4px; }
+    QWidget#projectActions QToolButton:hover { background: %(selection)s; }
     QLineEdit, QComboBox, QSpinBox { border: 1px solid %(border)s; border-radius: 6px; padding: 8px; background: %(editor)s; selection-background-color: %(selection)s; }
     QLineEdit:focus { border-color: %(accent)s; }
     QPlainTextEdit, QTextEdit { border: 0; background: %(editor)s; selection-background-color: %(selection)s; }

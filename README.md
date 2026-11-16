@@ -7,7 +7,7 @@
 
 IDE Python independente, disponível para macOS Intel e Windows x64, com arquitetura em Python/Qt e versão Linux planejada.
 
-**Versão 0.4.0: base macOS e versão portátil Windows, com terminal e console em abas. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+**Versão 0.5.0: explorador com menu de contexto, barra de ações, arquivos/pastas por clipboard e arrastar e soltar. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
 
 [Baixar a prévia Windows 0.4.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.4.0). Extraia o ZIP completo e execute `EditPy/EditPy.exe`.
 
@@ -140,3 +140,10 @@ Para reproduzir e inspecionar os ícones:
 .venv/bin/python scripts/create_file_icons.py
 .venv/bin/python scripts/preview_file_icons.py
 ```
+
+
+### Arquivos e pastas no explorador
+
+A barra abaixo de Projeto cria arquivos e pastas na pasta selecionada (ou ao lado do arquivo selecionado). O botão direito oferece Novo, Copiar, Colar, Criar pasta, Mover para, Mostrar no Finder/Explorer e Excluir. Excluir pede confirmação e usa a Lixeira do sistema. Cópias e movimentos não substituem itens existentes.
+
+Arraste arquivos ou uma pasta sobre o editor para abrir. Na árvore, arraste itens entre pastas para mover; use Option no macOS ou Ctrl no Windows para copiar. Itens externos soltos na árvore são copiados para a pasta de destino. A seleção múltipla é suportada. Copiar/Colar e Delete funcionam com foco na árvore. Ao mover arquivos abertos, suas abas e caminhos de salvamento acompanham o destino, inclusive com alterações ainda não salvas.

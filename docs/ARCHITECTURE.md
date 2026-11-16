@@ -57,3 +57,10 @@ As cores separam declaração, chamada, classe/tipo, parâmetro, atributo, decor
 `windows_terminal.py` adapta o contrato de sessão ao ConPTY/pywinpty. Um QTimer lê a saída Unicode sem bloquear e a converte para o stream UTF-8 compartilhado. O backend oferece escrita, redimensionamento e encerramento da árvore de processos. O shell padrão é cmd.exe; o REPL usa o Python selecionado. Não é necessário um interpretador externo para iniciar o shell Windows.
 
 `platforms.py` concentra shell, CommandLineToArgvW para argumentos de execução e aparência da barra de título via DWM. A versão portátil inclui ICO com sete resoluções, recursos PE de versão e avisos de terceiros. `packaging/windows.spec` e `scripts/build_windows.py` executam no Windows; GitHub Actions testa o código e o executável gerado. O frontend e os serviços de documentos permanecem compartilhados com macOS.
+
+
+## Explorador — 0.5.0
+
+`ProjectTree` implementa seleção múltipla e arrastar/soltar com URLs locais. `ExplorerMixin` conecta menu, clipboard, barra de ações e abas. `file_operations.py` prepara o lote antes da transferência, rejeita colisões e recursão em pastas, preserva links simbólicos e usa criação exclusiva para cópias de arquivos. Colar na pasta original gera nomes de cópia livres. Movimentos atualizam caminhos, highlighter, ícones e assinatura de disco dos documentos abertos sem descartar buffers modificados.
+
+A exclusão solicita confirmação, trata documentos modificados e chama QFile.moveToTrash, sem fallback de exclusão permanente. Arquivos do clipboard usam URLs nativas do Qt; itens externos soltos na árvore são copiados, enquanto itens internos são movidos por padrão. Na área do editor, o drop abre arquivos/pasta em vez de inserir URLs no documento. As operações de disco são síncronas nesta versão; transferências grandes podem ocupar a interface. Não há desfazer de operações do explorador.

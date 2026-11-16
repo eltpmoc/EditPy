@@ -93,3 +93,10 @@ Build Windows aprovado: https://github.com/eltpmoc/EditPy/actions/runs/439155873
 O executável portátil passou no smoke test empacotado com plataforma Qt Windows e fontes verificadas (editor, Jedi, Ruff, realce Python/JSON, ícones, temas, execução, ConPTY, REPL, abas mistas e Fechar projeto/pasta). O ZIP foi baixado para dist, seu SHA-256 foi conferido e o executável PE foi verificado como x86_64. A validação Windows foi automatizada; revisão visual em hardware Windows físico e Authenticode continuam pendentes.
 
 A captura do runner com plataforma Qt nativa foi revisada: fontes legíveis e terminal em aba. Registro em `screenshots/windows-terminal.png`. SHA-256 do ZIP 0.4.0: `e47a901f86fd44b51d66f09fbed16f30731a4492642716bc1f690aff7fc7008a`.
+
+
+## Explorador — 0.5.0
+
+Suíte macOS: 49 testes passaram e 5 cenários Windows foram ignorados. Treze novos cenários exercitam criação na seleção, menu/barra, cópia de pastas e seleção deduplicada, prevenção de colisões/recursão/traversal, movimentação com buffer modificado e salvamento no destino, cancelamento de cópia/exclusão, envio à Lixeira e falha da Lixeira, drop externo na árvore, drop no editor, drop interno e duplicação com nomes livres. O carregamento assíncrono da árvore é respeitado pelos testes de seleção.
+
+O smoke test passou a copiar e mover um arquivo real, verificando que a aba acompanha o destino e que a barra contém as quatro ações. O envio real de um arquivo temporário à Lixeira foi conferido no macOS.
