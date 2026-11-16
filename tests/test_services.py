@@ -38,7 +38,11 @@ def test_search_skips_dependencies_and_symlinks(tmp_path):
     (tmp_path / ".venv").mkdir()
     (tmp_path / ".venv" / "dependency.py").write_text("needle")
     (tmp_path / "main.py").write_text("first\nNeedle\nneedle again\n")
-    (tmp_path / "alias.py").symlink_to(tmp_path / "main.py")
+    try:
+        (tmp_path / "alias.py").symlink_to(tmp_path / "main.py")
+    except OSError:
+        if os.name != "nt":
+            raise
     matches = search_project(tmp_path, "needle")
     assert [(m.path.name, m.line) for m in matches] == [("main.py", 2), ("main.py", 3)]
     assert len(search_project(tmp_path, "needle", limit=1)) == 1

@@ -85,9 +85,13 @@ def verify(window, report):
                 checks["native_color_scheme"] = (
                     app.styleHints().colorScheme() == Qt.ColorScheme.Dark
                 )
-            if __import__("os").name == "posix":
+            if __import__("os").name in {"posix", "nt"}:
                 terminal = window.open_terminal()
-                terminal.session.write(b"test -t 0 && printf 'EDITPY_%s\\n' PTY_OK\r")
+                terminal.session.write(
+                    b"echo EDITPY_PTY_OK\r"
+                    if __import__("os").name == "nt"
+                    else b"test -t 0 && printf 'EDITPY_%s\\n' PTY_OK\r"
+                )
                 wait(lambda: "EDITPY_PTY_OK" in terminal.view.plain_text())
                 checks["terminal_pty"] = terminal.session.busy()
                 console = window.open_python_console()

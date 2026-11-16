@@ -120,4 +120,8 @@ def default_interpreter() -> str:
         return sys.executable
     import shutil
 
-    return shutil.which("python3") or shutil.which("python") or ""
+    return (
+        (shutil.which("python") or shutil.which("python3") or "")
+        if os.name == "nt"
+        else (shutil.which("python3") or shutil.which("python") or "")
+    )

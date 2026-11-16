@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "editpy-ide"
-version = "0.3.1"
+version = "0.4.0"
 description = "A focused, cross-platform Python IDE, designed first for macOS"
 requires-python = ">=3.11"
-dependencies = ["PySide6-Essentials>=6.8,<7", "jedi>=0.19,<0.21", "ruff>=0.14,<1", "pyte>=0.8.2,<0.9", "Pygments>=2.19,<3"]
+dependencies = ["PySide6-Essentials>=6.8,<7", "jedi>=0.19,<0.21", "ruff>=0.14,<1", "pyte>=0.8.2,<0.9", "Pygments>=2.19,<3", "pywinpty>=3.0.3,<4; sys_platform == 'win32'"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyinstaller>=6"]

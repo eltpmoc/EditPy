@@ -16,10 +16,14 @@ def main():
         help="Verificar Qt, Jedi, Ruff e execução e gravar JSON",
     )
     args = parser.parse_args()
+    if sys.platform == "win32":
+        import ctypes
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("eltpmoc.EditPy")
     app = QApplication(sys.argv[:1])
     app.setStyle("Fusion")
     app.setApplicationName("EditPy")
-    app.setApplicationVersion("0.3.1")
+    app.setApplicationVersion("0.4.0")
     app.setOrganizationName("EditPy")
     app.setAttribute(Qt.ApplicationAttribute.AA_DontShowIconsInMenus, False)
     if args.smoke_test:

@@ -9,6 +9,7 @@ Dependências diretas e ferramentas usadas:
 | Python | Runtime | PSF |
 | Qt / PySide6 / Shiboken | Interface desktop | LGPLv3/GPLv3/comercial, conforme componente |
 | Jedi / Parso | Inteligência Python | MIT |
+| pywinpty | Terminal ConPTY no Windows | MIT |
 | Pygments | Análise lexical e realce de código | BSD-2-Clause |
 | Ruff | Formatação e lint | MIT |
 | PyInstaller | Empacotamento | GPL com exceção para aplicações empacotadas |

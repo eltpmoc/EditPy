@@ -7,7 +7,7 @@
 
 IDE Python independente, com desenvolvimento iniciado no macOS Intel e arquitetura em Python/Qt para futura distribuição em Windows e Linux.
 
-**Versão 0.3.1: ícones por formato e realce sintático ampliado. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+**Versão 0.4.0: base macOS e versão portátil Windows, com terminal e console em abas. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/dark.png">
@@ -34,7 +34,7 @@ python3 -m venv .venv
 .venv/bin/python -m editpy .
 ```
 
-No Windows, use `.venv\Scripts\python.exe` no lugar de `.venv/bin/python`. O código foi preparado para diferenças de plataforma; Windows e Linux ainda precisam de testes e empacotamento próprios.
+No Windows, use `.venv\Scripts\python.exe` no lugar de `.venv/bin/python`. Consulte [a versão Windows](docs/WINDOWS.md) para requisitos, build e pacote portátil. Linux ainda precisa de validação e empacotamento próprios.
 
 ## O que já funciona
 
@@ -74,7 +74,7 @@ Use o botão **Terminal** na barra superior, o menu **Terminal → Novo terminal
 - Role para acessar até 5.000 linhas anteriores; arraste o mouse para selecionar texto.
 - Fechar a aba encerra sua sessão; sessões e processos não são restaurados ao reiniciar.
 
-A implementação usa PTY no macOS e tem uma rota POSIX para Linux, ainda sem validação nessa plataforma. Windows requer a futura integração ConPTY. O emulador implementa tela VT, cores ANSI, cursor e tela alternativa. Protocolos de mouse, gráficos, OSC 52 e compatibilidade integral com todos os aplicativos TUI ainda não são oferecidos.
+A implementação usa PTY no macOS e tem uma rota POSIX para Linux, ainda sem validação nessa plataforma. Windows usa o backend ConPTY com pywinpty. O emulador implementa tela VT, cores ANSI, cursor e tela alternativa. Protocolos de mouse, gráficos, OSC 52 e compatibilidade integral com todos os aplicativos TUI ainda não são oferecidos.
 
 O painel **Comandos** continua disponível em **Visualizar → Comando isolado (painel)** para execuções via pipes. O terminal em abas é a opção para sessões interativas persistentes.
 

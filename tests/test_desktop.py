@@ -265,7 +265,8 @@ def test_close_project_saves_files_and_stops_shell_and_run_process(
     monkeypatch.setattr(QMessageBox, "question", lambda *args: next(answers))
     assert window.close_project()
     assert path.read_text().startswith("# saved on close")
-    assert terminal.session.master is None
+    if os.name == "posix":
+        assert terminal.session.master is None
     assert not terminal.session.busy()
     assert not window.run_panel.busy()
     assert window.root is None
@@ -277,7 +278,9 @@ def test_cancel_process_confirmation_preserves_terminal(window, app, tmp_path, m
 
     monkeypatch.setenv("SHELL", "/bin/sh")
     terminal = window.open_terminal()
-    terminal.session.write(b"printf 'CLOSE_%s\\n' READY\r")
+    terminal.session.write(
+        b"echo CLOSE_READY\r" if os.name == "nt" else b"printf 'CLOSE_%s\\n' READY\r"
+    )
     wait(app, lambda: "CLOSE_READY" in terminal.view.plain_text())
     monkeypatch.setattr(QMessageBox, "question", lambda *args: QMessageBox.StandardButton.No)
     try:

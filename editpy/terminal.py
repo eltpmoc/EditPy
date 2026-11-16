@@ -33,6 +33,7 @@ from PySide6.QtWidgets import (
 )
 
 from .themes import THEMES
+from .platforms import shell_command
 
 # The controlling terminal is assigned in a fresh external Python process, never
 # in a Python preexec_fn/fork child of the multithreaded Qt application.
@@ -308,7 +309,13 @@ class TerminalView(QAbstractScrollArea):
         self.refresh()
 
     def set_font_size(self, size):
-        font = QFont("Menlo" if sys.platform == "darwin" else "DejaVu Sans Mono")
+        font = QFont(
+            "Menlo"
+            if sys.platform == "darwin"
+            else "Consolas"
+            if os.name == "nt"
+            else "DejaVu Sans Mono"
+        )
         font.setPointSize(size)
         font.setWeight(QFont.Weight.Normal)
         font.setFixedPitch(True)
@@ -525,11 +532,15 @@ class TerminalTab(QWidget):
         super().__init__()
         self.cwd = cwd
         self.console = console
-        shell = os.environ.get("SHELL", "/bin/zsh" if sys.platform == "darwin" else "/bin/bash")
-        if not Path(shell).is_file():
-            shell = "/bin/sh"
-        command = [interpreter, "-i"] if console else [shell, "-i"]
-        self.session = PtySession(interpreter, command, cwd, self)
+        shell_args = shell_command()
+        shell = shell_args[0]
+        command = [interpreter, "-i"] if console else shell_args
+        if os.name == "nt":
+            from .windows_terminal import WindowsSession
+
+            self.session = WindowsSession(interpreter, command, cwd, self)
+        else:
+            self.session = PtySession(interpreter, command, cwd, self)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)

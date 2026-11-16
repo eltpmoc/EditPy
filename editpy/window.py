@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -58,6 +57,7 @@ from .tasks import Worker, ProcessPanel
 from .themes import stylesheet
 from .terminal import TerminalTab
 from .project_tree import ProjectFilter, ProjectIcons
+from .platforms import parse_arguments, apply_native_theme
 
 
 class MainWindow(QMainWindow):
@@ -169,7 +169,11 @@ class MainWindow(QMainWindow):
         )
         layout.addWidget(self.recents)
         layout.addStretch(3)
-        footer = QLabel("⌘ P  Arquivos     /     ⌘ ⇧ P  Comandos     /     Ctrl Espaço  Completar")
+        footer = QLabel(
+            "⌘ P  Arquivos     /     ⌘ ⇧ P  Comandos     /     Ctrl Espaço  Completar"
+            if sys.platform == "darwin"
+            else "Ctrl P  Arquivos     /     Ctrl Shift P  Comandos     /     Ctrl Espaço  Completar"
+        )
         footer.setObjectName("muted")
         layout.addWidget(footer)
         self.stack.addWidget(welcome)
@@ -448,7 +452,7 @@ class MainWindow(QMainWindow):
             lambda: QMessageBox.about(
                 self,
                 "EditPy",
-                "EditPy 0.3.1\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nPrimeira versão macOS.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
+                "EditPy 0.4.0\nIDE Python independente.\n\nEditor • Jedi • Ruff • pdb • Git\nPrimeira versão macOS.\n\nConsulte docs/ROADMAP.md para a cobertura de recursos.",
             ),
         )
 
@@ -531,7 +535,7 @@ class MainWindow(QMainWindow):
         ]
 
     def open_terminal(self, checked=False, console=False):
-        if not self.interpreter:
+        if not self.interpreter and (console or os.name != "nt"):
             return self.error("Selecione um interpretador Python em Preferências.")
         try:
             tab = TerminalTab(
@@ -1227,7 +1231,7 @@ class MainWindow(QMainWindow):
         if not self.interpreter:
             return self.preferences()
         try:
-            arguments = shlex.split(self.arguments, posix=os.name != "nt")
+            arguments = parse_arguments(self.arguments)
         except ValueError as error:
             return self.error(error)
         args = ["-u"]
@@ -1402,6 +1406,7 @@ class MainWindow(QMainWindow):
             Qt.ColorScheme.Dark if theme == "dark" else Qt.ColorScheme.Light
         )
         app.setStyleSheet(stylesheet(theme))
+        apply_native_theme(self, theme)
         self.settings.setValue("theme", theme)
         self.update_brand()
         for i in range(self.tabs.count()):

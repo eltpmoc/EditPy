@@ -136,6 +136,9 @@ class ProcessPanel(QWidget):
             if os.name == "posix":
                 os.killpg(pid, signal.SIGKILL)
             else:
+                from .windows_terminal import terminate_process_tree
+
+                terminate_process_tree(pid)
                 self.process.kill()
         except (ProcessLookupError, PermissionError):
             self.process.kill()
