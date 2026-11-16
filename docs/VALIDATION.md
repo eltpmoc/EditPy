@@ -1,0 +1,84 @@
+# Validação local — 16/11/2026
+
+## Ambiente
+
+- macOS 26.7.3 em Intel x86_64, conforme o ambiente disponibilizado.
+- Python 3.14.7; PySide6-Essentials 6.12.0; Jedi 0.19.2; Ruff 0.17.5.
+- Versões exatas do ambiente em `requirements-macos.lock` (gerado no macOS; não é um lock universal entre plataformas).
+
+## Testes automatizados
+
+A suíte usa arquivos temporários e uma instância Qt com plataforma offscreen e preferências isoladas. Cobre:
+
+1. Leitura e escrita de código Python com encoding latin-1.
+2. Salvamento completo e preservação de permissão executável.
+3. Rejeição de binários e arquivos maiores que o limite.
+4. Busca ignorando dependências e links simbólicos.
+5. Símbolos e erros de sintaxe sem executar o projeto.
+6. Edição, salvamento, mudança de tema, recarga externa e abas únicas.
+7. Substituição com desfazer e comentários em bloco.
+8. Execução real de Python com entrada/saída e término do processo.
+9. Breakpoint real com pdb e inspeção de variável.
+10. Conclusão real com Jedi e formatação com Ruff.
+11. Preservação de alteração local ao detectar conflito com disco.
+12. Autoindentação por eventos reais de teclado Qt.
+13. Interrupção de processo Python em execução.
+14. Isolamento das chaves de sessão entre projetos.
+
+Comandos:
+
+```sh
+.venv/bin/python -m pytest -q
+.venv/bin/python -m ruff check editpy tests scripts examples
+.venv/bin/python -m compileall -q editpy
+.venv/bin/python -m pip check
+```
+
+## Verificação do pacote
+
+O modo explícito `--smoke-test REPORT` cria um projeto temporário, abre um arquivo, consulta Jedi, formata via Ruff, salva, executa o Python selecionado e alterna os dois temas. Produz um relatório JSON e uma captura da janela; termina com código diferente de zero se alguma verificação falhar. As preferências desse modo são isoladas.
+
+```sh
+dist/EditPy.app/Contents/MacOS/EditPy --smoke-test build/package-smoke.json
+```
+
+Os resultados de execução ficam na pasta local `build/`, ignorada no Git. Capturas de revisão de ambos os temas estão em `docs/screenshots/`.
+
+O empacotador verifica a assinatura local antes e depois desse teste. A inicialização do pacote desabilita escrita de bytecode nos processos Python herdados, evitando que os subprocessos de inspeção do Jedi adicionem arquivos `__pycache__` ao bundle assinado.
+
+## Limites da validação
+
+Ainda faltam validação em Windows, Linux, Apple Silicon, outros computadores, leitores de tela, layouts internacionais de teclado e projetos grandes. As capturas geradas por Qt offscreen verificam layout, mas não substituem testes de interação no sistema operacional. O pacote local não representa uma distribuição pública assinada e notarizada.
+
+## Tema nativo e identidade visual
+
+A revisão da barra de título usa `QApplication.styleHints().setColorScheme`, além do stylesheet. A verificação `scripts/check_native_theme.py` consulta o `effectiveAppearance` da NSWindow real via runtime Objective-C, em plataforma Cocoa: escuro = `NSAppearanceNameDarkAqua`, claro = `NSAppearanceNameAqua`. Ela executa escuro → claro → escuro sem reiniciar a janela.
+
+A suíte passou a incluir o carregamento do ícone e de ambos os logotipos em cada tema (15 testes). O smoke test do pacote também valida a marca e o esquema de cores nativo no macOS.
+
+Documentação: https://doc.qt.io/qt-6/qstylehints.html#setColorScheme
+
+## Revisão 0.2.0 — abas de terminal
+
+Resultado da suíte local: **23 testes passaram**. Os oito novos cenários de integração cobrem PTY real e diretório persistente; entrada pelo teclado e Ctrl+C; dimensões transmitidas ao processo; REPL Python multilinha e Unicode; cores, scrollback e tela alternativa; documentos e terminais mistos, copiar/colar e fechamento imediato; Tab para conclusão do shell; cancelamento de troca de projeto preservando documentos e sessões.
+
+O smoke test do pacote passou a abrir um shell em PTY, verificar `test -t 0`, executar um comando, abrir um REPL Python e executar uma expressão. Também verifica que salvar ignora sessões e que ambos os tipos de abas acompanham o tema. Os relatórios locais ficam em `build/source-smoke.json` e `build/package-smoke.json`.
+
+Capturas do editor, terminal e console Python estão em `docs/screenshots/`, em versões claras e escuras. As sessões usadas nas capturas são processos reais com preferências isoladas.
+
+Limites: testes de PTY realizados no macOS Intel desta máquina. Não foi realizada validação em Linux nem implementado ConPTY no Windows. O terminal não implementa todos os protocolos xterm ou todas as combinações de grafemas Unicode.
+
+## Ícone e reconhecimento do pacote no Finder
+
+O pacote foi reconstruído com `packaging/macos.spec`, incluindo versão 0.2.0, categoria de ferramentas de desenvolvimento e macOS mínimo 14.0 antes da assinatura. O build compara o ICNS distribuído com a matriz do projeto, verifica o executável e valida a assinatura antes e depois do smoke test.
+
+A geração agora ocorre em `build/macos-dist`; somente o pacote completo e validado é publicado em `dist/EditPy.app`. O pacote anterior fica preservado em `build/previous`. O registro do aplicativo é atualizado individualmente via LaunchServices, sem limpar caches globais nem modificar proteções do sistema.
+
+Verificação visual no Finder: o novo ícone aparece sem o símbolo de proibição. O smoke test do pacote e a verificação da assinatura passaram após a reconstrução. A causa exata do estado anterior do cache não foi demonstrada; o ICNS anterior, o executável Intel e a assinatura já eram válidos.
+
+
+## Revisão 0.3.0 — ícones e cores
+
+A suíte local cobre 31 cenários, incluindo papéis de declaração/parâmetro/chamada/tipo; isolamento entre funções; comentários com aspas; strings com `#`; strings multilinha e código após o delimitador; interpolação de f-strings; identificadores Unicode e posições UTF-16; Python incompleto; lexer JSON e texto simples; descarte de análises antigas; troca de paleta; nomes e extensões especiais; renderização dos SVGs e atualização do ícone/lexer ao salvar como.
+
+O smoke test empacotado também verifica o realce de funções, a análise JSON e o carregamento de ícones representativos. O atlas de ícones e as capturas do editor em ambos os temas ficam em `docs/screenshots/`.
