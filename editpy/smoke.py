@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QTextCursor
+from PySide6.QtGui import QTextCursor, QFontMetrics
 from PySide6.QtWidgets import QApplication
 
 
@@ -76,6 +76,8 @@ def verify(window, report):
             window.set_theme("dark")
             app.processEvents()
             checks["themes"] = True
+            metrics = QFontMetrics(window.font())
+            checks["ui_fonts"] = all(metrics.inFontUcs4(ord(char)) for char in "EditPy ação")
             checks["brand"] = (
                 not window.windowIcon().isNull()
                 and not window.brand_label.pixmap().isNull()
