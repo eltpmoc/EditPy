@@ -21,7 +21,7 @@ py -3.14 -m venv .venv
 .venv\Scripts\python.exe scripts\build_windows.py
 ```
 
-O build gera `dist/EditPy-0.4.0-Windows-x64.zip` e o SHA-256 correspondente. O ícone ICO contém sete resoluções. O empacotador inclui recursos, dependências nativas e avisos de terceiros, verifica o `.exe` e testa editor, execução, realce, terminal ConPTY, console e fechamento de projeto antes de criar o ZIP.
+O build gera `dist/EditPy-0.5.0-Windows-x64.zip` e o SHA-256 correspondente. O ícone ICO contém sete resoluções. O empacotador inclui recursos, dependências nativas e avisos de terceiros, verifica o `.exe` e testa editor, execução, realce, terminal ConPTY, console e fechamento de projeto antes de criar o ZIP.
 
 ## Automação
 
@@ -34,3 +34,8 @@ Os testes específicos do Windows cobrem TTY real, entrada Unicode, sessão cmd,
 A versão 0.4.0 foi gerada e validada no [runner Windows](https://github.com/eltpmoc/EditPy/actions/runs/43915587302): 33 testes passaram, com 8 cenários POSIX ignorados. O teste do executável empacotado retornou `ok: true`, incluindo fontes da interface nativa, terminal, console e fechamento de projeto. O ZIP portátil está na [release 0.4.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.4.0).
 
 ![Interface Windows com terminal ConPTY em aba](screenshots/windows-terminal.png)
+
+
+## Explorador — 0.5.0
+
+A atualização adiciona menu de contexto, barra de ações, seleção múltipla, clipboard e arrastar/soltar. Os 46 testes Windows passaram (8 casos POSIX ignorados) no [runner nativo](https://github.com/eltpmoc/EditPy/actions/runs/43918548925). O executável empacotado também passou no teste de cópia/movimentação com atualização do caminho da aba. [Download 0.5.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.5.0).

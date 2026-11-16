@@ -7,7 +7,7 @@ EditPy tem como objetivo tornar-se uma IDE Python completa, com identidade visua
 | Área | Situação em 0.2.0 | Evolução necessária |
 | --- | --- | --- |
 | Interface | Temas claro/escuro, abas, painéis, preferências | Acessibilidade completa, atalhos editáveis, zoom, localização |
-| Projetos | Abrir pasta, recentes, árvore, criar arquivo | Assistentes de projetos, renomear/mover/excluir, múltiplas raízes |
+| Projetos | Abrir/fechar pasta, recentes, árvore, menu de contexto, criar/copiar/colar/mover, Lixeira e arrastar/soltar | Assistentes de projetos, renomear, desfazer operações, múltiplas raízes |
 | Edição | Python, numeração, autoindentação, comentários | Folding, múltiplos cursores, pares de delimitadores, minimapa, split editor |
 | Persistência | Escrita atômica, encoding Python, conflito externo, abas salvas | Recuperação de documentos não salvos e histórico local |
 | Busca | Texto no arquivo/projeto, substituição no arquivo | Regex, filtros, substituição no projeto com prévia |
@@ -19,7 +19,7 @@ EditPy tem como objetivo tornar-se uma IDE Python completa, com identidade visua
 | Depuração | pdb com breakpoints e inspeção textual | DAP/debugpy, variáveis/pilha visuais, watches, condições, threads e attach |
 | Testes | unittest e comandos manuais | Árvore pytest/unittest, seleção, falhas navegáveis, cobertura e debug |
 | Ambientes | Seleção de Python, criação .venv, pip list | Detecção automática, Poetry, uv, Conda e gestão de pacotes |
-| Console | Terminal PTY e REPL Python persistentes em abas no macOS; múltiplas sessões, ANSI, scrollback e encerramento | ConPTY Windows, validar Linux, compatibilidade TUI adicional e persistência de perfis |
+| Console | Terminal PTY no macOS, ConPTY no Windows e REPL Python persistentes em abas; múltiplas sessões, ANSI, scrollback e encerramento | Validar Linux, compatibilidade TUI adicional e persistência de perfis |
 | Git | Status e diff HEAD, somente leitura | Stage/unstage, commits, histórico, branches, conflitos e merge visual |
 
 ## Etapa 2 — inteligência e refatoração
@@ -55,7 +55,7 @@ EditPy tem como objetivo tornar-se uma IDE Python completa, com identidade visua
 
 1. Consolidar macOS Intel: integração Cocoa, testes reais de teclado, retina, suspensão, arquivos externos e projetos grandes.
 2. Criar build macOS Apple Silicon e testar em hardware arm64. Não declarar universal sem validar ambas as arquiteturas.
-3. Empacotar e validar Windows: caminhos, quoting, processos, ConPTY, atalhos e instalador.
+3. Ampliar a validação Windows em hardware físico; instalador e assinatura Authenticode. O pacote portátil, ConPTY, caminhos/quoting e testes no runner já estão disponíveis.
 4. Empacotar e validar Linux: Wayland/X11, shell, permissões, ícones e AppImage/deb.
 5. Adicionar CI por plataforma, assinatura/notarização, instaladores, atualizações, SBOM e auditoria de licenças.
 
