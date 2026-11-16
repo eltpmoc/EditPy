@@ -102,3 +102,5 @@ Suíte macOS: 49 testes passaram e 5 cenários Windows foram ignorados. Treze no
 O smoke test passou a copiar e mover um arquivo real, verificando que a aba acompanha o destino e que a barra contém as quatro ações. O envio real de um arquivo temporário à Lixeira foi conferido no macOS.
 
 Windows 0.5.0: 46 testes passaram e 8 casos POSIX foram ignorados no run https://github.com/eltpmoc/EditPy/actions/runs/43918548925 (commit b6e96f7). O teste de seleção usa Path para normalizar separadores Windows. O macOS foi empacotado, passou no smoke test com `explorer_operations: true` e foi instalado em `/Applications/EditPy.app` com assinatura verificada e backup da versão anterior. O botão Novo arquivo foi conferido no aplicativo instalado; o evento Qt de contexto também foi verificado com um popup real.
+
+O ZIP Windows 0.5.0 foi baixado e conferido por CRC e SHA-256; o executável é PE x86_64. Hash: `e19dc211450ddbca88e26e6619f97ab6372104e8d263e408064007aa4ec4ad71`. As capturas com a barra do explorador estão em `screenshots/explorer-macos.png` e `screenshots/explorer-windows.png`.
