@@ -47,7 +47,7 @@ def select(window, path, app):
         for row in range(window.tree_model.rowCount(parent)):
             index = window.tree_model.index(row, 0, parent)
             source = window.tree_model.mapToSource(index)
-            if window.model.filePath(source) == str(path):
+            if Path(window.model.filePath(source)) == path:
                 return index
         return None
 
