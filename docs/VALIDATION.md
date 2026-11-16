@@ -76,14 +76,18 @@ A geração agora ocorre em `build/macos-dist`; somente o pacote completo e vali
 
 Verificação visual no Finder: o novo ícone aparece sem o símbolo de proibição. O smoke test do pacote e a verificação da assinatura passaram após a reconstrução. A causa exata do estado anterior do cache não foi demonstrada; o ICNS anterior, o executável Intel e a assinatura já eram válidos.
 
-
 ## Revisão 0.3.0 — ícones e cores
 
 A suíte local cobre 31 cenários, incluindo papéis de declaração/parâmetro/chamada/tipo; isolamento entre funções; comentários com aspas; strings com `#`; strings multilinha e código após o delimitador; interpolação de f-strings; identificadores Unicode e posições UTF-16; Python incompleto; lexer JSON e texto simples; descarte de análises antigas; troca de paleta; nomes e extensões especiais; renderização dos SVGs e atualização do ícone/lexer ao salvar como.
 
 O smoke test empacotado também verifica o realce de funções, a análise JSON e o carregamento de ícones representativos. O atlas de ícones e as capturas do editor em ambos os temas ficam em `docs/screenshots/`.
 
-
 ## Revisão 0.3.1 — fechar projeto/pasta
 
 A suíte passou a 36 cenários. Os novos testes acionam a opção do menu e verificam limpeza da área de trabalho, reabertura posterior e início sem restaurar o projeto fechado; cancelamento de documentos modificados; salvamento antes de encerrar shell/processo; cancelamento da confirmação de processos; descarte de resultados de background recebidos após o fechamento. O smoke test empacotado também fecha o projeto e confere abas, árvore e preferências.
+
+## Windows — 0.4.0
+
+Build Windows aprovado: https://github.com/eltpmoc/EditPy/actions/runs/43915587302 (commit 179613f). Runner Windows Server 2025 x64, Python 3.14.10. Resultado: 33 testes passaram; 8 cenários POSIX foram ignorados. O macOS passou nos 36 testes compartilhados/POSIX e ignorou os 5 específicos de Windows.
+
+O executável portátil passou no smoke test empacotado com plataforma Qt Windows e fontes verificadas (editor, Jedi, Ruff, realce Python/JSON, ícones, temas, execução, ConPTY, REPL, abas mistas e Fechar projeto/pasta). O ZIP foi baixado para dist, seu SHA-256 foi conferido e o executável PE foi verificado como x86_64. A validação Windows foi automatizada; revisão visual em hardware Windows físico e Authenticode continuam pendentes.

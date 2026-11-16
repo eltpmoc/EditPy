@@ -28,3 +28,7 @@ O build gera `dist/EditPy-0.4.0-Windows-x64.zip` e o SHA-256 correspondente. O �
 O workflow `.github/workflows/windows.yml` executa testes e build em um runner Windows do GitHub Actions. O ZIP e o relatório de validação ficam no artefato `EditPy-Windows-x64` do run, com retenção de 30 dias.
 
 Os testes específicos do Windows cobrem TTY real, entrada Unicode, sessão cmd, REPL, redimensionamento e argumentos/caminhos com espaços. Os testes POSIX permanecem separados. A validação automatizada não substitui revisão visual em computadores Windows físicos.
+
+## Resultado de validação
+
+A versão 0.4.0 foi gerada e validada no [runner Windows](https://github.com/eltpmoc/EditPy/actions/runs/43915587302): 33 testes passaram, com 8 cenários POSIX ignorados. O teste do executável empacotado retornou `ok: true`, incluindo fontes da interface nativa, terminal, console e fechamento de projeto. O ZIP portátil está na [release 0.4.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.4.0).

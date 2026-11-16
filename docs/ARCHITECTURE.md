@@ -12,7 +12,7 @@ Jedi fornece conclusão, definição e documentação. Ruff é chamado como ferr
 
 A interface permanece na thread Qt principal. Busca, inteligência, formatação e Git executam em QThreadPool com resultado por signals. Execução e shell utilizam QProcess, sem bloquear a interface. Operações de formatação descartam resultados se o conteúdo mudou. A busca descarta resultados de uma solicitação superada ou de outro projeto.
 
-Processos em POSIX iniciam nova sessão; Parar encerra o grupo do processo. No Windows, a implementação atual encerra somente o processo direto. A versão Windows precisará de Job Objects e validação de processos descendentes.
+Processos em POSIX iniciam nova sessão; Parar encerra o grupo do processo. No Windows, o encerramento usa taskkill /T para alcançar a árvore de processos. O terminal usa um backend ConPTY separado, mantendo a mesma tela Qt.
 
 ## Arquivos e limites
 
@@ -32,7 +32,6 @@ Inspeção local de metadados em 16/11/2026: `/Applications/PyCharm.app/Contents
 
 REA não estava conectado à sessão. O diagnóstico CLI informou ausência de registro Codex; nenhuma configuração foi alterada. Não houve decompilação, cópia de código, recursos ou identidade visual do PyCharm. As escolhas do EditPy são implementação própria, com dependências públicas.
 
-
 ## Terminal e interface — 0.2.0
 
 `terminal.py` mantém uma sessão PTY independente por aba. O dispositivo é criado com `posix_openpt` e `O_NOCTTY`; o escravo é aberto somente com `O_NOCTTY` no processo GUI. Um Python externo executa um bootstrap isolado, cria sua sessão com `setsid`, abre o escravo, atribui `TIOCSCTTY`, redireciona os descritores e executa o shell ou o REPL. O QProcess não abre o escravo no processo GUI. Isso evita herança indevida de terminal controlador e elimina callbacks Python depois de fork na aplicação Qt com múltiplas threads.
@@ -45,7 +44,6 @@ Documentos e terminais são tipos distintos na área de abas. Salvar e restaurar
 
 A árvore usa um proxy com filtro de diretórios gerados e um provedor de ícones vetoriais do EditPy, sem associações visuais de outros aplicativos. A barra lateral oferece acesso a projeto, busca, Git, terminal e console Python.
 
-
 ## Ícones e realce — 0.3.0
 
 `file_icons.py` centraliza prioridades por nome e extensão para o explorador e as abas. `ProjectIcons` fornece QIcons com cache; pastas incluem estados fechado/aberto. As fontes SVG são produzidas por `scripts/create_file_icons.py`, com rótulos convertidos em contornos para não depender de fontes na máquina de destino. A árvore inclui dotfiles de projeto e mantém os filtros de diretórios gerados.
@@ -53,3 +51,9 @@ A árvore usa um proxy com filtro de diretórios gerados e um provedor de ícone
 `syntax.py` aplica Pygments ao documento completo e usa AST somente para acrescentar papéis sintáticos em código Python válido. O arquivo nunca é importado. Código incompleto conserva a análise lexical. Uma tarefa por documento executa no QThreadPool global, após breve debounce; geração, texto e caminho são conferidos antes da aplicação. As cores lexicais locais continuam disponíveis durante a digitação. A renderização traduz índices Python/UTF-8 do AST para as unidades UTF-16 do QTextDocument, incluindo caracteres fora do BMP.
 
 As cores separam declaração, chamada, classe/tipo, parâmetro, atributo, decorator, constante, string, docstring, escape, comentário, número, operador e pontuação, com paletas próprias para cada tema. Essa camada não substitui um servidor de linguagem nem resolve integralmente símbolos entre arquivos; é um complemento sintático ao lexer. Formatos não Python usam o lexer identificado pelo nome do arquivo. Salvar como atualiza caminho, ícone e lexer.
+
+## Windows — 0.4.0
+
+`windows_terminal.py` adapta o contrato de sessão ao ConPTY/pywinpty. Um QTimer lê a saída Unicode sem bloquear e a converte para o stream UTF-8 compartilhado. O backend oferece escrita, redimensionamento e encerramento da árvore de processos. O shell padrão é cmd.exe; o REPL usa o Python selecionado. Não é necessário um interpretador externo para iniciar o shell Windows.
+
+`platforms.py` concentra shell, CommandLineToArgvW para argumentos de execução e aparência da barra de título via DWM. A versão portátil inclui ICO com sete resoluções, recursos PE de versão e avisos de terceiros. `packaging/windows.spec` e `scripts/build_windows.py` executam no Windows; GitHub Actions testa o código e o executável gerado. O frontend e os serviços de documentos permanecem compartilhados com macOS.
