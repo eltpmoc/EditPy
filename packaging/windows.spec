@@ -1,11 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 import shutil
 import sys
+import sysconfig
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, copy_metadata
 
 root = Path(SPECPATH).parent
-ruff = shutil.which('ruff.exe', path=str(Path(sys.executable).parent))
+ruff = shutil.which('ruff.exe', path=sysconfig.get_path('scripts')) or shutil.which('ruff.exe')
 if not ruff:
     raise SystemExit('Ruff não encontrado no ambiente de build.')
 datas = [(str(root / 'editpy' / 'assets'), 'editpy/assets'), (str(root / 'docs'), 'docs'),
