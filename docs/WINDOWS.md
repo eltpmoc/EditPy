@@ -39,3 +39,7 @@ A versão 0.4.0 foi gerada e validada no [runner Windows](https://github.com/elt
 ## Explorador — 0.5.0
 
 A atualização adiciona menu de contexto, barra de ações, seleção múltipla, clipboard e arrastar/soltar. Os 46 testes Windows passaram (8 casos POSIX ignorados) no [runner nativo](https://github.com/eltpmoc/EditPy/actions/runs/43918548925). O executável empacotado também passou no teste de cópia/movimentação com atualização do caminho da aba. [Download 0.5.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.5.0).
+
+## Continuação em C++/Qt
+
+Para iniciar o desenvolvimento nativo em uma máquina Windows, abra o repositório no Codex e use [PROMPT_WINDOWS_CPP.md](PROMPT_WINDOWS_CPP.md). O documento registra o estado validado e os requisitos da migração; a implementação C++ ainda não foi iniciada.
