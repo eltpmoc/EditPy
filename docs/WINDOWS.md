@@ -32,3 +32,5 @@ Os testes específicos do Windows cobrem TTY real, entrada Unicode, sessão cmd,
 ## Resultado de validação
 
 A versão 0.4.0 foi gerada e validada no [runner Windows](https://github.com/eltpmoc/EditPy/actions/runs/43915587302): 33 testes passaram, com 8 cenários POSIX ignorados. O teste do executável empacotado retornou `ok: true`, incluindo fontes da interface nativa, terminal, console e fechamento de projeto. O ZIP portátil está na [release 0.4.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.4.0).
+
+![Interface Windows com terminal ConPTY em aba](screenshots/windows-terminal.png)

@@ -91,3 +91,5 @@ A suíte passou a 36 cenários. Os novos testes acionam a opção do menu e veri
 Build Windows aprovado: https://github.com/eltpmoc/EditPy/actions/runs/43915587302 (commit 179613f). Runner Windows Server 2025 x64, Python 3.14.10. Resultado: 33 testes passaram; 8 cenários POSIX foram ignorados. O macOS passou nos 36 testes compartilhados/POSIX e ignorou os 5 específicos de Windows.
 
 O executável portátil passou no smoke test empacotado com plataforma Qt Windows e fontes verificadas (editor, Jedi, Ruff, realce Python/JSON, ícones, temas, execução, ConPTY, REPL, abas mistas e Fechar projeto/pasta). O ZIP foi baixado para dist, seu SHA-256 foi conferido e o executável PE foi verificado como x86_64. A validação Windows foi automatizada; revisão visual em hardware Windows físico e Authenticode continuam pendentes.
+
+A captura do runner com plataforma Qt nativa foi revisada: fontes legíveis e terminal em aba. Registro em `screenshots/windows-terminal.png`. SHA-256 do ZIP 0.4.0: `e47a901f86fd44b51d66f09fbed16f30731a4492642716bc1f690aff7fc7008a`.

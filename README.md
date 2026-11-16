@@ -5,9 +5,11 @@
   <img src="assets/brand/editpy-logo-light.png" alt="EditPy" width="320">
 </picture>
 
-IDE Python independente, com desenvolvimento iniciado no macOS Intel e arquitetura em Python/Qt para futura distribuição em Windows e Linux.
+IDE Python independente, disponível para macOS Intel e Windows x64, com arquitetura em Python/Qt e versão Linux planejada.
 
 **Versão 0.4.0: base macOS e versão portátil Windows, com terminal e console em abas. Ainda não oferece equivalência completa ao PyCharm.** O detalhamento do produto e os recursos pendentes estão em [docs/ROADMAP.md](docs/ROADMAP.md).
+
+[Baixar a prévia Windows 0.4.0](https://github.com/eltpmoc/EditPy/releases/tag/v0.4.0). Extraia o ZIP completo e execute `EditPy/EditPy.exe`.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/dark.png">
